@@ -1,0 +1,127 @@
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+.wa{font-family:'Nunito',sans-serif;background:#FFF8F2;border:2.5px solid #2A1F3D;border-radius:16px;overflow:hidden}
+.wh{background:#2A1F3D;padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+.whl{display:flex;align-items:center;gap:10px}
+.wt{font-family:'Klee One',cursive;font-size:16px;color:#F2A7C0;line-height:1}
+.ws{font-size:11px;color:#9ED5C0;margin-top:3px}
+.sbtn{background:none;border:1.5px solid #9ED5C0;border-radius:20px;color:#9ED5C0;font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;padding:5px 13px;cursor:pointer;letter-spacing:.3px}
+.sbtn:hover{background:rgba(158,213,192,.18)}
+#wmap{height:300px}
+.wstrip{display:flex;overflow-x:auto;border-top:2.5px solid #2A1F3D;background:#FFF8F2;scrollbar-width:none}
+.wstrip::-webkit-scrollbar{display:none}
+.wcard{flex-shrink:0;width:136px;padding:12px 10px 12px 14px;border-right:1.5px solid rgba(42,31,61,.1);cursor:pointer;transition:background .15s;position:relative;display:flex;flex-direction:column;align-items:flex-start}
+.wcard:last-child{border-right:none}
+.wcard:hover{background:rgba(42,31,61,.04)}
+.wcard.act{background:rgba(42,31,61,.07)}
+.wca{position:absolute;left:0;top:0;bottom:0;width:4px}
+.wct{font-size:10px;font-weight:700;letter-spacing:.6px;margin-bottom:4px}
+.wcn{font-family:'Klee One',cursive;font-size:12px;font-weight:600;color:#2A1F3D;line-height:1.3;margin-top:5px}
+.wcd{font-size:10px;color:#7A6E8A;margin-top:2px;line-height:1.35}
+.leaflet-popup-content-wrapper{border:2px solid #2A1F3D!important;border-radius:13px!important;box-shadow:3px 3px 0 rgba(42,31,61,.35)!important;background:#FFF8F2!important;font-family:'Nunito',sans-serif!important}
+.leaflet-popup-tip{background:#2A1F3D!important}
+.leaflet-popup-content{margin:10px 13px!important}
+.pname{font-family:'Klee One',cursive;font-size:13px;font-weight:600;color:#2A1F3D;margin-top:6px;text-align:center}
+.ptime{font-size:10px;font-weight:700;letter-spacing:.5px;margin-top:2px;text-align:center}
+.pnote{font-size:11px;color:#7A6E8A;margin-top:3px;text-align:center}
+</style>
+
+<div class="wa">
+  <div class="wh">
+    <div class="whl">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="3" fill="#F2A7C0"/>
+        <ellipse cx="14" cy="7.5" rx="2.8" ry="4.5" fill="#F2A7C0" transform="rotate(0 14 14)"/>
+        <ellipse cx="14" cy="7.5" rx="2.8" ry="4.5" fill="#F2A7C0" transform="rotate(72 14 14)"/>
+        <ellipse cx="14" cy="7.5" rx="2.8" ry="4.5" fill="#F2A7C0" transform="rotate(144 14 14)"/>
+        <ellipse cx="14" cy="7.5" rx="2.8" ry="4.5" fill="#F2A7C0" transform="rotate(216 14 14)"/>
+        <ellipse cx="14" cy="7.5" rx="2.8" ry="4.5" fill="#F2A7C0" transform="rotate(288 14 14)"/>
+      </svg>
+      <div><div class="wt">Notre Soirée</div><div class="ws">Samedi 13 juin · Paris</div></div>
+    </div>
+    <button class="sbtn" onclick="doShare()">Télécharger</button>
+  </div>
+  <div id="wmap"></div>
+  <div class="wstrip" id="wstrip"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+function svgCrepe(){return`<svg width="60" height="60" viewBox="0 0 60 60" fill="none"><polygon points="30,56 5,22 55,22" fill="#F5D5A0" stroke="#2A1F3D" stroke-width="2" stroke-linejoin="round"/><circle cx="30" cy="16" r="9" fill="#FFF8F2" stroke="#2A1F3D" stroke-width="2"/><circle cx="20" cy="18" r="6.5" fill="#FFF8F2" stroke="#2A1F3D" stroke-width="2"/><circle cx="40" cy="18" r="6.5" fill="#FFF8F2" stroke="#2A1F3D" stroke-width="2"/><ellipse cx="30" cy="8" rx="4.5" ry="5.5" fill="#F06070" stroke="#2A1F3D" stroke-width="1.5"/><path d="M27.5 5 Q30 2.5 32.5 5" fill="#7DC870" stroke="#2A1F3D" stroke-width="1.3"/><path d="M7 9L8.5 6L10 9L8.5 12Z" fill="#F7C85A" stroke="#2A1F3D" stroke-width=".9"/><path d="M51 7L52.5 4L54 7L52.5 10Z" fill="#F7C85A" stroke="#2A1F3D" stroke-width=".9"/><circle cx="46" cy="3" r="1.8" fill="#F2A7C0"/></svg>`;}
+function svgJardin(){return`<svg width="60" height="60" viewBox="0 0 60 60" fill="none"><rect x="4" y="24" width="9" height="28" rx="2" fill="#F5EDD5" stroke="#2A1F3D" stroke-width="2"/><rect x="25.5" y="19" width="9" height="33" rx="2" fill="#F5EDD5" stroke="#2A1F3D" stroke-width="2"/><rect x="47" y="24" width="9" height="28" rx="2" fill="#F5EDD5" stroke="#2A1F3D" stroke-width="2"/><path d="M4 24 Q10 9 30 9 Q50 9 56 24" fill="none" stroke="#2A1F3D" stroke-width="2.2" stroke-linecap="round"/><rect x="28" y="38" width="4" height="11" rx="1" fill="#B07840" stroke="#2A1F3D" stroke-width="1.4"/><circle cx="30" cy="33" r="10" fill="#9ED5C0" stroke="#2A1F3D" stroke-width="2"/><circle cx="13" cy="52" r="3.5" fill="#F2A7C0" stroke="#2A1F3D" stroke-width="1.4"/><circle cx="47" cy="52" r="3.5" fill="#F2A7C0" stroke="#2A1F3D" stroke-width="1.4"/><path d="M3 10L4.5 7L6 10L4.5 13Z" fill="#F7C85A" stroke="#2A1F3D" stroke-width=".9"/><path d="M54 7L55.5 4L57 7L55.5 10Z" fill="#F7C85A" stroke="#2A1F3D" stroke-width=".9"/></svg>`;}
+function svgPont(){return`<svg width="60" height="60" viewBox="0 0 60 60" fill="none"><circle cx="49" cy="14" r="9" fill="#F7C85A" stroke="#2A1F3D" stroke-width="2"/><path d="M2 38 L11 38 C13 28 19 24 23 28 C25 22 30 20 30 28 C30 20 35 22 37 28 C41 24 47 28 49 38 L58 38" fill="none" stroke="#2A1F3D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="2" y1="38" x2="58" y2="38" stroke="#2A1F3D" stroke-width="2.8" stroke-linecap="round"/><line x1="23" y1="38" x2="23" y2="46" stroke="#2A1F3D" stroke-width="2"/><line x1="37" y1="38" x2="37" y2="46" stroke="#2A1F3D" stroke-width="2"/><path d="M2 47 Q16 43 30 47 Q44 51 58 47" fill="none" stroke="#9ED5C0" stroke-width="1.8" stroke-linecap="round"/><path d="M6 23L7.5 20L9 23L7.5 26Z" fill="#C5B8E8" stroke="#2A1F3D" stroke-width=".9"/><path d="M28 9L29.5 6L31 9L29.5 12Z" fill="#C5B8E8" stroke="#2A1F3D" stroke-width=".9"/></svg>`;}
+function svgCathedrale(){return`<svg width="60" height="60" viewBox="0 0 60 60" fill="none"><path d="M46 8 Q57 13 57 21 Q57 30 46 33 Q52 26 52 21 Q52 15 46 8Z" fill="#F7C85A" stroke="#2A1F3D" stroke-width="1.5"/><rect x="2" y="22" width="21" height="30" rx="1" fill="#E8E0F5" stroke="#2A1F3D" stroke-width="2"/><polygon points="2,22 12.5,6 23,22" fill="#C5B8E8" stroke="#2A1F3D" stroke-width="2" stroke-linejoin="round"/><rect x="27" y="26" width="21" height="26" rx="1" fill="#E8E0F5" stroke="#2A1F3D" stroke-width="2"/><polygon points="27,26 37.5,11 48,26" fill="#C5B8E8" stroke="#2A1F3D" stroke-width="2" stroke-linejoin="round"/><circle cx="12.5" cy="30" r="4.5" fill="none" stroke="#2A1F3D" stroke-width="1.5"/><line x1="12.5" y1="25.5" x2="12.5" y2="34.5" stroke="#2A1F3D" stroke-width="1"/><line x1="8" y1="30" x2="17" y2="30" stroke="#2A1F3D" stroke-width="1"/><path d="M5 52 L5 42 Q12.5 33 20 42 L20 52" fill="#C5B8E8" stroke="#2A1F3D" stroke-width="1.5"/><path d="M30 52 L30 43 Q37.5 35 45 43 L45 52" fill="#C5B8E8" stroke="#2A1F3D" stroke-width="1.5"/><path d="M50 37L51.5 34L53 37L51.5 40Z" fill="#F7C85A" stroke="#2A1F3D" stroke-width=".9"/><path d="M1 14L2.5 11L4 14L2.5 17Z" fill="#F7C85A" stroke="#2A1F3D" stroke-width=".9"/></svg>`;}
+function svgCinema(){return`<svg width="60" height="60" viewBox="0 0 60 60" fill="none"><rect x="1" y="8" width="58" height="28" rx="7" fill="#F08070" stroke="#2A1F3D" stroke-width="2"/><rect x="7" y="14" width="46" height="16" rx="3" fill="#FFF8F2" stroke="#2A1F3D" stroke-width="1.4"/><line x1="12" y1="20" x2="48" y2="20" stroke="#2A1F3D" stroke-width="1.8" stroke-linecap="round"/><line x1="15" y1="26" x2="45" y2="26" stroke="#2A1F3D" stroke-width="1.3" stroke-linecap="round"/><circle cx="9" cy="9" r="2" fill="#F7C85A" stroke="#2A1F3D" stroke-width=".9"/><circle cx="18" cy="9" r="2" fill="#F7C85A" stroke="#2A1F3D" stroke-width=".9"/><circle cx="27" cy="9" r="2" fill="#F7C85A" stroke="#2A1F3D" stroke-width=".9"/><circle cx="36" cy="9" r="2" fill="#F7C85A" stroke="#2A1F3D" stroke-width=".9"/><circle cx="45" cy="9" r="2" fill="#F7C85A" stroke="#2A1F3D" stroke-width=".9"/><circle cx="51" cy="9" r="2" fill="#F7C85A" stroke="#2A1F3D" stroke-width=".9"/><line x1="17" y1="36" x2="17" y2="43" stroke="#2A1F3D" stroke-width="1.6" stroke-linecap="round"/><line x1="43" y1="36" x2="43" y2="43" stroke="#2A1F3D" stroke-width="1.6" stroke-linecap="round"/><circle cx="30" cy="51" r="10" fill="white" stroke="#2A1F3D" stroke-width="2"/><path d="M30 41L32.5 46L30 48L27.5 46Z" fill="#2A1F3D"/><path d="M39.5 48L37 46L38 50L42 51.5Z" fill="#2A1F3D"/><path d="M20.5 48L23 46L22 50L18 51.5Z" fill="#2A1F3D"/></svg>`;}
+
+const stops=[
+  {time:'20h00',name:'Comptoir Harajuku',note:'Crêpes japonaises',lat:48.866968,lng:2.333248,color:'#F2A7C0',illus:svgCrepe()},
+  {time:'20h30',name:'Palais Royal',note:'Jardin & colonnes',lat:48.8649723,lng:2.3378061,color:'#9ED5C0',illus:svgJardin()},
+  {time:'21h15',name:'Pont des Arts',note:'Coucher de soleil',lat:48.8583424,lng:2.3375084,color:'#F7C85A',illus:svgPont()},
+  {time:'22h00',name:'Notre-Dame',note:'Parvis illuminé',lat:48.852968,lng:2.3499021,color:'#C5B8E8',illus:svgCathedrale()},
+  {time:'23h15',name:'Grand Rex',note:'Brésil vs Maroc',lat:48.8705451,lng:2.3476866,color:'#F08070',illus:svgCinema()}
+];
+
+const strip=document.getElementById('wstrip');
+stops.forEach((stop,i)=>{
+  const card=document.createElement('div');
+  card.className='wcard';
+  card.innerHTML=`<div class="wca" style="background:${stop.color}"></div><div class="wct" style="color:${stop.color}">${stop.time}</div>${stop.illus}<div class="wcn">${stop.name}</div><div class="wcd">${stop.note}</div>`;
+  card.addEventListener('click',()=>{
+    map.flyTo([stop.lat,stop.lng],17,{duration:1.1});
+    markers[i].openPopup();
+    document.querySelectorAll('.wcard').forEach(c=>c.classList.remove('act'));
+    card.classList.add('act');
+  });
+  strip.appendChild(card);
+});
+
+const map=L.map('wmap',{zoomControl:true,scrollWheelZoom:false,attributionControl:false});
+
+// Satellite layer — Esri World Imagery (no API key needed)
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{
+  maxZoom:19,
+  attribution:'Esri'
+}).addTo(map);
+
+// Labels overlay sur le satellite pour voir les noms de rues
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png',{
+  maxZoom:19,
+  opacity:0.85
+}).addTo(map);
+
+// Fit map to show all stops
+const bounds=L.latLngBounds(stops.map(s=>[s.lat,s.lng]));
+map.fitBounds(bounds,{padding:[40,40]});
+
+function mkIcon(stop,num){
+  return L.divIcon({
+    className:'',
+    html:`<div style="width:38px;height:38px;background:${stop.color};border:2.5px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.5);font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;color:#2A1F3D;cursor:pointer">${num}</div>`,
+    iconSize:[38,38],iconAnchor:[19,38],popupAnchor:[0,-40]
+  });
+}
+
+const markers=[];
+stops.forEach((stop,i)=>{
+  const m=L.marker([stop.lat,stop.lng],{icon:mkIcon(stop,i+1)}).addTo(map)
+    .bindPopup(`<div style="text-align:center">${stop.illus}<div class="pname">${stop.name}</div><div class="ptime" style="color:${stop.color}">${stop.time}</div><div class="pnote">${stop.note}</div></div>`,{maxWidth:185});
+  markers.push(m);
+});
+
+// Route avec lueur blanche pour lisibilité sur fond sombre
+L.polyline(stops.map(s=>[s.lat,s.lng]),{color:'#ffffff',weight:4,opacity:.25}).addTo(map);
+L.polyline(stops.map(s=>[s.lat,s.lng]),{color:'#ffffff',weight:2,dashArray:'7,6',opacity:.7}).addTo(map);
+
+function doShare(){
+  try{
+    const html='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
+    const blob=new Blob([html],{type:'text/html'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download='notre-soiree-13juin.html';a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }catch(e){alert('Télécharge le fichier depuis Claude !');}
+}
+</script>
