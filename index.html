@@ -1,292 +1,263 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
-<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Nunito:wght@400;600;700&display=swap"
-  rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box
-  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body { height: 100%; background: #1a1228; }
 
   .wa {
     font-family: 'Nunito', sans-serif;
     background: #FFF8F2;
-    border: 2.5px solid #2A1F3D;
-    border-radius: 18px;
-    overflow: hidden;
-    max-width: 920px;
+    max-width: 480px;
     width: 100%;
     margin: 0 auto;
-    box-shadow: 0 18px 40px rgba(42, 31, 61, .12)
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
   }
 
+  /* ── HEADER ── */
   .wh {
     background: #2A1F3D;
-    padding: 12px 16px;
+    padding: 14px 16px 13px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px
+    gap: 10px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 10;
   }
 
-  .whl {
-    display: flex;
-    align-items: center;
-    gap: 10px
-  }
+  .whl { display: flex; align-items: center; gap: 10px; }
 
   .wt {
     font-family: 'Klee One', cursive;
-    font-size: 16px;
+    font-size: 18px;
     color: #F2A7C0;
-    line-height: 1
+    line-height: 1;
   }
 
-  .ws {
-    font-size: 11px;
-    color: #9ED5C0;
-    margin-top: 3px
-  }
+  .ws { font-size: 11px; color: #9ED5C0; margin-top: 3px; }
 
   .sbtn {
-    background: none;
+    background: rgba(158,213,192,.15);
     border: 1.5px solid #9ED5C0;
-    border-radius: 20px;
+    border-radius: 50%;
     color: #9ED5C0;
-    font-family: 'Nunito', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 7px 14px;
-    cursor: pointer;
-    letter-spacing: .3px;
-    transition: transform .18s ease, background .18s ease, border-color .18s ease, color .18s ease;
-    touch-action: manipulation;
-    white-space: nowrap
-  }
-
-  .sbtn:hover {
-    background: rgba(158, 213, 192, .18)
-  }
-
-  .sbtn:active {
-    transform: scale(.97)
-  }
-
-  #wmap {
-    height: clamp(320px, 55vh, 520px);
-    min-height: 280px
-  }
-
-  .wstrip {
+    width: 42px;
+    height: 42px;
     display: flex;
-    overflow-x: auto;
-    border-top: 2.5px solid #2A1F3D;
-    background: #FFF8F2;
-    scrollbar-width: none;
-    scroll-snap-type: x proximity;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-x
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background .18s;
+    touch-action: manipulation;
   }
 
-  .wstrip::-webkit-scrollbar {
-    display: none
+  .sbtn:active { background: rgba(158,213,192,.3); }
+
+  /* ── MAP ── */
+  #wmap {
+    height: 46dvh;
+    min-height: 260px;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  /* ── ÉTAPES LABEL ── */
+  .wstrip-label {
+    background: #2A1F3D;
+    color: #F2A7C0;
+    font-family: 'Klee One', cursive;
+    font-size: 12px;
+    letter-spacing: .8px;
+    padding: 8px 16px 7px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .wstrip-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(242,167,192,.25);
+  }
+
+  /* ── GRILLE DES CARDS ── */
+  .wstrip {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 12px 12px 20px;
+    background: #FFF8F2;
+    overflow-y: auto;
+  }
+
+  /* La première card (ou une seule) prend toute la largeur si impair */
+  .wstrip .wcard:first-child:nth-last-child(odd):last-child {
+    grid-column: 1 / -1;
   }
 
   .wcard {
-    flex-shrink: 0;
-    width: 136px;
-    padding: 12px 10px 12px 14px;
-    border-right: 1.5px solid rgba(42, 31, 61, .1);
+    background: #fff;
+    border-radius: 16px;
+    border: 1.5px solid rgba(42,31,61,.1);
+    padding: 14px 12px 12px;
     cursor: pointer;
-    transition: background .15s, transform .18s ease, box-shadow .18s ease;
-    position: relative;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    scroll-snap-align: start;
+    align-items: center;
+    gap: 0;
+    position: relative;
+    transition: transform .15s ease, box-shadow .15s ease, background .15s;
+    touch-action: manipulation;
     user-select: none;
-    touch-action: manipulation
+    overflow: hidden;
   }
 
-  .wcard:last-child {
-    border-right: none
-  }
-
-  .wcard:hover {
-    background: rgba(42, 31, 61, .04)
-  }
-
-  .wcard:active {
-    transform: translateY(1px) scale(.985)
-  }
+  .wcard:active { transform: scale(.97); }
 
   .wcard.act {
-    background: rgba(42, 31, 61, .07)
+    border-color: transparent;
+    box-shadow: 0 0 0 2.5px var(--c), 0 6px 18px rgba(0,0,0,.1);
+    background: #fffcfa;
   }
 
+  /* barre couleur en haut */
   .wca {
     position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    border-radius: 16px 16px 0 0;
   }
 
   .wct {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
-    letter-spacing: .6px;
-    margin-bottom: 4px
+    letter-spacing: .5px;
+    margin-top: 4px;
+    margin-bottom: 6px;
+    align-self: flex-start;
   }
+
+  .wcard svg { width: 52px; height: 52px; }
 
   .wcn {
-    font-family: 'Klee One', cursive;
-    font-size: 12px;
-    font-weight: 600;
-    color: #2A1F3D;
-    line-height: 1.3;
-    margin-top: 5px
-  }
-
-  .wcd {
-    font-size: 10px;
-    color: #7A6E8A;
-    margin-top: 2px;
-    line-height: 1.35
-  }
-
-  .wgl {
-    margin-top: 8px;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 10px;
-    font-weight: 700;
-    color: #2A1F3D;
-    text-decoration: none;
-    border: 1px solid rgba(42, 31, 61, .18);
-    border-radius: 999px;
-    padding: 4px 8px;
-    background: rgba(255, 255, 255, .45);
-    transition: transform .18s ease, background .18s ease, border-color .18s ease
-  }
-
-  .wgl:hover {
-    background: rgba(42, 31, 61, .05);
-    border-color: rgba(42, 31, 61, .28)
-  }
-
-  .wgl:active {
-    transform: scale(.98)
-  }
-
-  .leaflet-popup-content-wrapper {
-    border: 2px solid #2A1F3D !important;
-    border-radius: 13px !important;
-    box-shadow: 3px 3px 0 rgba(42, 31, 61, .35) !important;
-    background: #FFF8F2 !important;
-    font-family: 'Nunito', sans-serif !important
-  }
-
-  .leaflet-popup-tip {
-    background: #2A1F3D !important
-  }
-
-  .leaflet-popup-content {
-    margin: 10px 13px !important
-  }
-
-  .pname {
     font-family: 'Klee One', cursive;
     font-size: 13px;
     font-weight: 600;
     color: #2A1F3D;
-    margin-top: 6px;
-    text-align: center
+    line-height: 1.3;
+    margin-top: 8px;
+    text-align: center;
   }
 
-  .ptime {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: .5px;
-    margin-top: 2px;
-    text-align: center
-  }
-
-  .pnote {
-    font-size: 11px;
+  .wcd {
+    font-size: 10.5px;
     color: #7A6E8A;
     margin-top: 3px;
-    text-align: center
+    text-align: center;
+    line-height: 1.35;
   }
 
-  @media (max-width:700px) {
-    .wa {
-      border-radius: 16px
-    }
+  .wgl {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #2A1F3D;
+    text-decoration: none;
+    border: 1.5px solid rgba(42,31,61,.2);
+    border-radius: 999px;
+    padding: 7px 12px;
+    background: rgba(42,31,61,.04);
+    width: 100%;
+    transition: background .15s;
+    touch-action: manipulation;
+    min-height: 36px;
+  }
 
-    .wh {
-      padding: 12px 12px 11px;
-      align-items: flex-start;
-      flex-direction: column
-    }
+  .wgl:active { background: rgba(42,31,61,.1); }
 
-    .whl {
-      width: 100%
-    }
+  /* ── POPUP ── */
+  .leaflet-popup-content-wrapper {
+    border: 2px solid #2A1F3D !important;
+    border-radius: 14px !important;
+    box-shadow: 3px 3px 0 rgba(42,31,61,.3) !important;
+    background: #FFF8F2 !important;
+    font-family: 'Nunito', sans-serif !important;
+  }
 
-    .sbtn {
-      width: 100%;
-      padding: 10px 14px;
-      font-size: 12px
-    }
+  .leaflet-popup-tip { background: #2A1F3D !important; }
+  .leaflet-popup-content { margin: 10px 14px !important; }
 
-    .wt {
-      font-size: 17px
-    }
+  .pname { font-family: 'Klee One', cursive; font-size: 13px; font-weight: 600; color: #2A1F3D; margin-top: 6px; text-align: center; }
+  .ptime { font-size: 10px; font-weight: 700; letter-spacing: .5px; margin-top: 2px; text-align: center; }
+  .pnote { font-size: 11px; color: #7A6E8A; margin-top: 3px; text-align: center; }
+  .ppopup-maps {
+    display: block;
+    margin-top: 8px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #2A1F3D;
+    text-decoration: none;
+    border: 1.5px solid rgba(42,31,61,.2);
+    border-radius: 999px;
+    padding: 6px 14px;
+    background: rgba(42,31,61,.04);
+  }
+  .ppopup-maps:active { background: rgba(42,31,61,.1); }
 
-    .ws {
-      font-size: 10px
-    }
-
-    #wmap {
-      height: clamp(320px, 52vh, 430px)
-    }
-
-    .wstrip {
-      padding: 0 6px
-    }
-
-    .wcard {
-      width: 124px;
-      padding: 11px 9px 11px 13px
-    }
-
-    .wcn {
-      font-size: 11px
-    }
+  /* ── DESKTOP fallback ── */
+  @media (min-width: 500px) {
+    .wa { border-radius: 20px; margin: 24px auto; min-height: unset; box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+    #wmap { height: 380px; }
+    .wstrip { max-height: none; }
   }
 </style>
 
 <div class="wa">
+  <!-- HEADER -->
   <div class="wh">
     <div class="whl">
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-        <circle cx="14" cy="14" r="3" fill="#F2A7C0" />
-        <ellipse cx="14" cy="7.5" rx="2.8" ry="4.5" fill="#F2A7C0" transform="rotate(0 14 14)" />
-        <ellipse cx="14" cy="7.5" rx="2.8" ry="4.5" fill="#F2A7C0" transform="rotate(72 14 14)" />
-        <ellipse cx="14" cy="7.5" rx="2.8" ry="4.5" fill="#F2A7C0" transform="rotate(144 14 14)" />
-        <ellipse cx="14" cy="7.5" rx="2.8" ry="4.5" fill="#F2A7C0" transform="rotate(216 14 14)" />
-        <ellipse cx="14" cy="7.5" rx="2.8" ry="4.5" fill="#F2A7C0" transform="rotate(288 14 14)" />
+      <svg width="30" height="30" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="3" fill="#F2A7C0"/>
+        <ellipse cx="14" cy="7.5" rx="2.8" ry="4.5" fill="#F2A7C0" transform="rotate(0 14 14)"/>
+        <ellipse cx="14" cy="7.5" rx="2.8" ry="4.5" fill="#F2A7C0" transform="rotate(72 14 14)"/>
+        <ellipse cx="14" cy="7.5" rx="2.8" ry="4.5" fill="#F2A7C0" transform="rotate(144 14 14)"/>
+        <ellipse cx="14" cy="7.5" rx="2.8" ry="4.5" fill="#F2A7C0" transform="rotate(216 14 14)"/>
+        <ellipse cx="14" cy="7.5" rx="2.8" ry="4.5" fill="#F2A7C0" transform="rotate(288 14 14)"/>
       </svg>
       <div>
         <div class="wt">Notre Soirée</div>
         <div class="ws">Samedi 13 juin · Paris</div>
       </div>
     </div>
-    <button class="sbtn" onclick="doShare()">Télécharger</button>
+    <button class="sbtn" onclick="doShare()" title="Télécharger">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+    </button>
   </div>
+
+  <!-- MAP -->
   <div id="wmap"></div>
+
+  <!-- ÉTAPES -->
+  <div class="wstrip-label">✦ Les étapes</div>
   <div class="wstrip" id="wstrip"></div>
 </div>
 
@@ -307,70 +278,74 @@
   ];
 
   const strip = document.getElementById('wstrip');
+
   stops.forEach((stop, i) => {
     const card = document.createElement('div');
     card.className = 'wcard';
+    card.style.setProperty('--c', stop.color);
     const gmapUrl = `https://www.google.com/maps/search/?api=1&query=${stop.lat},${stop.lng}`;
-    card.innerHTML = `<div class="wca" style="background:${stop.color}"></div><div class="wct" style="color:${stop.color}">${stop.time}</div>${stop.illus}<div class="wcn">${stop.name}</div><div class="wcd">${stop.note}</div><a class="wgl" href="${gmapUrl}" target="_blank" rel="noopener noreferrer">Ouvrir sur Google Maps</a>`;
+    card.innerHTML = `
+      <div class="wca" style="background:${stop.color}"></div>
+      <div class="wct" style="color:${stop.color}">${stop.time}</div>
+      ${stop.illus}
+      <div class="wcn">${stop.name}</div>
+      <div class="wcd">${stop.note}</div>
+      <a class="wgl" href="${gmapUrl}" target="_blank" rel="noopener noreferrer">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Maps
+      </a>`;
+
     card.addEventListener('click', () => {
       map.flyTo([stop.lat, stop.lng], 17, { duration: 1.1 });
       markers[i].openPopup();
       document.querySelectorAll('.wcard').forEach(c => c.classList.remove('act'));
       card.classList.add('act');
-      card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
     });
-    card.querySelector('.wgl').addEventListener('click', (event) => event.stopPropagation());
+    card.querySelector('.wgl').addEventListener('click', e => e.stopPropagation());
     strip.appendChild(card);
   });
 
   const map = L.map('wmap', { zoomControl: true, scrollWheelZoom: false, attributionControl: false });
 
-  // Satellite layer — Esri World Imagery (no API key needed)
   L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    maxZoom: 19,
-    attribution: 'Esri'
+    maxZoom: 19
   }).addTo(map);
 
-  // Labels overlay sur le satellite pour voir les noms de rues
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
-    maxZoom: 19,
-    opacity: 0.85
+    maxZoom: 19, opacity: 0.85
   }).addTo(map);
 
-  // Fit map to show all stops
   const bounds = L.latLngBounds(stops.map(s => [s.lat, s.lng]));
-  map.fitBounds(bounds, { padding: [40, 40] });
+  map.fitBounds(bounds, { padding: [36, 36] });
 
   function mkIcon(stop, num) {
     return L.divIcon({
       className: '',
-      html: `<div style="width:38px;height:38px;background:${stop.color};border:2.5px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.5);font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;color:#2A1F3D;cursor:pointer">${num}</div>`,
-      iconSize: [38, 38], iconAnchor: [19, 38], popupAnchor: [0, -40]
+      html: `<div style="width:40px;height:40px;background:${stop.color};border:2.5px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.55);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;color:#2A1F3D;cursor:pointer">${num}</div>`,
+      iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -44]
     });
   }
 
   const markers = [];
   stops.forEach((stop, i) => {
+    const gmapUrl = `https://www.google.com/maps/search/?api=1&query=${stop.lat},${stop.lng}`;
     const m = L.marker([stop.lat, stop.lng], { icon: mkIcon(stop, i + 1) }).addTo(map)
-      .bindPopup(`<div style="text-align:center">${stop.illus}<div class="pname">${stop.name}</div><div class="ptime" style="color:${stop.color}">${stop.time}</div><div class="pnote">${stop.note}</div></div>`, { maxWidth: 185 });
+      .bindPopup(`<div style="text-align:center">${stop.illus}<div class="pname">${stop.name}</div><div class="ptime" style="color:${stop.color}">${stop.time}</div><div class="pnote">${stop.note}</div><a class="ppopup-maps" href="${gmapUrl}" target="_blank" rel="noopener noreferrer">Ouvrir dans Maps</a></div>`, { maxWidth: 190 });
     markers.push(m);
     m.on('click', () => {
       document.querySelectorAll('.wcard').forEach(c => c.classList.remove('act'));
       const currentCard = strip.children[i];
       if (currentCard) {
         currentCard.classList.add('act');
-        currentCard.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        currentCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     });
   });
 
-  if (strip.firstElementChild) {
-    strip.firstElementChild.classList.add('act');
-  }
+  if (strip.firstElementChild) strip.firstElementChild.classList.add('act');
 
-  // Route avec lueur blanche pour lisibilité sur fond sombre
-  L.polyline(stops.map(s => [s.lat, s.lng]), { color: '#ffffff', weight: 4, opacity: .25 }).addTo(map);
-  L.polyline(stops.map(s => [s.lat, s.lng]), { color: '#ffffff', weight: 2, dashArray: '7,6', opacity: .7 }).addTo(map);
+  L.polyline(stops.map(s => [s.lat, s.lng]), { color: '#ffffff', weight: 4, opacity: .2 }).addTo(map);
+  L.polyline(stops.map(s => [s.lat, s.lng]), { color: '#ffffff', weight: 2, dashArray: '7,6', opacity: .65 }).addTo(map);
 
   function doShare() {
     try {
