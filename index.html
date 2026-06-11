@@ -3,19 +3,21 @@
 <link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet"/>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-.wa{font-family:'Nunito',sans-serif;background:#FFF8F2;border:2.5px solid #2A1F3D;border-radius:16px;overflow:hidden}
-.wh{background:#2A1F3D;padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+.wa{font-family:'Nunito',sans-serif;background:#FFF8F2;border:2.5px solid #2A1F3D;border-radius:18px;overflow:hidden;max-width:920px;width:100%;margin:0 auto;box-shadow:0 18px 40px rgba(42,31,61,.12)}
+.wh{background:#2A1F3D;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .whl{display:flex;align-items:center;gap:10px}
 .wt{font-family:'Klee One',cursive;font-size:16px;color:#F2A7C0;line-height:1}
 .ws{font-size:11px;color:#9ED5C0;margin-top:3px}
-.sbtn{background:none;border:1.5px solid #9ED5C0;border-radius:20px;color:#9ED5C0;font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;padding:5px 13px;cursor:pointer;letter-spacing:.3px}
+.sbtn{background:none;border:1.5px solid #9ED5C0;border-radius:20px;color:#9ED5C0;font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;padding:7px 14px;cursor:pointer;letter-spacing:.3px;transition:transform .18s ease,background .18s ease,border-color .18s ease,color .18s ease;touch-action:manipulation;white-space:nowrap}
 .sbtn:hover{background:rgba(158,213,192,.18)}
-#wmap{height:300px}
-.wstrip{display:flex;overflow-x:auto;border-top:2.5px solid #2A1F3D;background:#FFF8F2;scrollbar-width:none}
+.sbtn:active{transform:scale(.97)}
+#wmap{height:clamp(320px,55vh,520px);min-height:280px}
+.wstrip{display:flex;overflow-x:auto;border-top:2.5px solid #2A1F3D;background:#FFF8F2;scrollbar-width:none;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;touch-action:pan-x}
 .wstrip::-webkit-scrollbar{display:none}
-.wcard{flex-shrink:0;width:136px;padding:12px 10px 12px 14px;border-right:1.5px solid rgba(42,31,61,.1);cursor:pointer;transition:background .15s;position:relative;display:flex;flex-direction:column;align-items:flex-start}
+.wcard{flex-shrink:0;width:136px;padding:12px 10px 12px 14px;border-right:1.5px solid rgba(42,31,61,.1);cursor:pointer;transition:background .15s,transform .18s ease,box-shadow .18s ease;position:relative;display:flex;flex-direction:column;align-items:flex-start;scroll-snap-align:start;user-select:none;touch-action:manipulation}
 .wcard:last-child{border-right:none}
 .wcard:hover{background:rgba(42,31,61,.04)}
+.wcard:active{transform:translateY(1px) scale(.985)}
 .wcard.act{background:rgba(42,31,61,.07)}
 .wca{position:absolute;left:0;top:0;bottom:0;width:4px}
 .wct{font-size:10px;font-weight:700;letter-spacing:.6px;margin-bottom:4px}
@@ -27,6 +29,18 @@
 .pname{font-family:'Klee One',cursive;font-size:13px;font-weight:600;color:#2A1F3D;margin-top:6px;text-align:center}
 .ptime{font-size:10px;font-weight:700;letter-spacing:.5px;margin-top:2px;text-align:center}
 .pnote{font-size:11px;color:#7A6E8A;margin-top:3px;text-align:center}
+@media (max-width:700px){
+  .wa{border-radius:16px}
+  .wh{padding:12px 12px 11px;align-items:flex-start;flex-direction:column}
+  .whl{width:100%}
+  .sbtn{width:100%;padding:10px 14px;font-size:12px}
+  .wt{font-size:17px}
+  .ws{font-size:10px}
+  #wmap{height:clamp(320px,52vh,430px)}
+  .wstrip{padding:0 6px}
+  .wcard{width:124px;padding:11px 9px 11px 13px}
+  .wcn{font-size:11px}
+}
 </style>
 
 <div class="wa">
@@ -74,6 +88,7 @@ stops.forEach((stop,i)=>{
     markers[i].openPopup();
     document.querySelectorAll('.wcard').forEach(c=>c.classList.remove('act'));
     card.classList.add('act');
+    card.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
   });
   strip.appendChild(card);
 });
@@ -109,7 +124,19 @@ stops.forEach((stop,i)=>{
   const m=L.marker([stop.lat,stop.lng],{icon:mkIcon(stop,i+1)}).addTo(map)
     .bindPopup(`<div style="text-align:center">${stop.illus}<div class="pname">${stop.name}</div><div class="ptime" style="color:${stop.color}">${stop.time}</div><div class="pnote">${stop.note}</div></div>`,{maxWidth:185});
   markers.push(m);
+  m.on('click',()=>{
+    document.querySelectorAll('.wcard').forEach(c=>c.classList.remove('act'));
+    const currentCard=strip.children[i];
+    if(currentCard){
+      currentCard.classList.add('act');
+      currentCard.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
+    }
+  });
 });
+
+if(strip.firstElementChild){
+  strip.firstElementChild.classList.add('act');
+}
 
 // Route avec lueur blanche pour lisibilité sur fond sombre
 L.polyline(stops.map(s=>[s.lat,s.lng]),{color:'#ffffff',weight:4,opacity:.25}).addTo(map);
